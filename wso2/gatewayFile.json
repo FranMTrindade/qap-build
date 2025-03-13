@@ -1,0 +1,48 @@
+{
+  "version": 3,
+  "timeout": "5000ms",
+  "cache_ttl": "300s",
+  "output_encoding": "no-op",
+  "port": 3890,
+  "endpoints": [
+    {
+      "endpoint": "/pet",
+      "method": "PUT",
+      "output_encoding": "no-op",
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET",
+            "HEAD",
+            "POST"
+          ],
+          "expose_headers": [
+            "Content-Length",
+            "Content-Type"
+          ],
+          "allow_headers": [
+            "Accept-Language"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v3/pet",
+          "encoding": "no-op",
+          "sd": "static",
+          "method": "PUT",
+          "cache_ttl": "300s",
+          "host": [
+            "https://petstore3.swagger.io"
+          ],
+          "disable_host_sanitize": false
+        }
+      ]
+    }
+  ]
+}
