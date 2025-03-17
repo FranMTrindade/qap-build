@@ -1,0 +1,36 @@
+{
+  "info": {
+    "title": "Konneqt",
+    "version": "0.1.9",
+    "description": "Description "
+  },
+  "tags": [],
+  "paths": {},
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "http://api.example.com/v1",
+      "description": "Main (production) server"
+    },
+    {
+      "url": "http://staging-api.example.com",
+      "description": "Internal test server"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "components": {
+    "schemas": {},
+    "requestBodies": {},
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
