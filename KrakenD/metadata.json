@@ -1,0 +1,9 @@
+{
+  "workspace": {
+    "name": "Pet-Api2"
+  },
+  "environment": {
+    "repository": "qap-build.git",
+    "gitUsername": "FranMTrindade"
+  }
+}
