@@ -1,0 +1,78 @@
+name: Deploy KrakenD API Gateway
+
+on:
+  push:
+    paths:
+      - "KrakenD/gatewayFile.json"
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Notifying QAP Admin Api - Starting Login in Docker
+        run: |
+          curl --location 'https://webhook.site/a1abf43f-52ac-4267-b3a1-d7ff6b667675' \
+            --header 'Content-Type: application/json' \
+            --data '{
+              "api_name": "Sample API",
+              "status": "LOGIN_IN_DOCKER",
+              "final_endpoint_host": "${{ secrets.KRAKEND_URL_APIGATEWAY }}"
+            }'
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+
+      - name: Set Image Name
+        run: echo "IMAGE_NAME=${{ secrets.DOCKER_IMAGE_NAME }}" >> $GITHUB_ENV
+        env:
+          IMAGE_NAME: IMAGE_NAME=${{ secrets.DOCKER_IMAGE_NAME }}
+
+      - name: Notifying QAP Admin Api - Webhook for building image docker
+        run: |
+            curl --location 'https://webhook.site/a1abf43f-52ac-4267-b3a1-d7ff6b667675' \
+              --header 'Content-Type: application/json' \
+              --data '{
+                "api_name": "Sample API",
+                "status": "BUILD_IMAGE_DOCKER",
+                "final_endpoint_host": "${{ secrets.KRAKEND_URL_APIGATEWAY }}"
+              }'
+      - name: Build Docker Image
+        run: docker build -t $IMAGE_NAME -f ./KrakenD/Dockerfile .
+
+      - name: Push Docker Image
+        run: docker push $IMAGE_NAME
+
+      - name: Notifying QAP Admin Api - Webhook for docker push
+        run: |
+            curl --location 'https://webhook.site/a1abf43f-52ac-4267-b3a1-d7ff6b667675' \
+              --header 'Content-Type: application/json' \
+              --data '{
+                "api_name": "Sample API",
+                "status": "IMAGED_BUILT_AND_PUSHED",
+                "final_endpoint_host": "${{ secrets.KRAKEND_URL_APIGATEWAY }}"
+              }'        
+
+      - name: Deploy to CapRover via Docker Image
+        uses: caprover/deploy-from-github@v1.1.2
+        with:
+          server: "${{ secrets.CAPROVER_SERVER }}"
+          app: "${{ secrets.KRAKEND_CAPROVER_APP_NAME }}"
+          token: "${{ secrets.KRAKEND_CAPROVER_TOKEN }}"
+          image: "franmtrindade/krakend-gw-sample:latest"
+
+      - name: Notifying QAP Admin Api - Final
+        run: |
+              curl --location 'https://webhook.site/a1abf43f-52ac-4267-b3a1-d7ff6b667675' \
+                --header 'Content-Type: application/json' \
+                --data '{
+                  "api_name": "Sample API",
+                  "status": "DEPLOYED",
+                  "final_endpoint_host": "${{ secrets.KRAKEND_URL_APIGATEWAY }}"
+                }'
