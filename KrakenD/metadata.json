@@ -1,0 +1,9 @@
+{
+  "workspace": {
+    "name": "fluxo completo"
+  },
+  "environment": {
+    "repository": "qap-build.git",
+    "gitUsername": "FranMTrindade"
+  }
+}
