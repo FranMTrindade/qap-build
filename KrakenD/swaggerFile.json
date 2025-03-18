@@ -1,0 +1,435 @@
+{
+  "info": {
+    "title": "Events API",
+    "x-logo": {
+      "url": "https://api.apis.guru/v2/cache/logo/https_upload.wikimedia.org_wikipedia_commons_thumb_e_e3_1password-logo.svg_1280px-1password-logo.svg.png"
+    },
+    "version": "1.0.0",
+    "x-origin": [
+      {
+        "url": "https://i.1password.com/media/1password-events-reporting/1password-events-api.yaml",
+        "format": "openapi",
+        "version": "3.0"
+      }
+    ],
+    "description": "1Password Events API Specification.",
+    "x-serviceName": "events",
+    "x-providerName": "1password.com",
+    "x-apisguru-categories": [
+      "security"
+    ]
+  },
+  "tags": [],
+  "paths": {},
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "/",
+      "description": "Main (production) server"
+    },
+    {
+      "url": "/",
+      "description": "Internal test server"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "components": {
+    "schemas": {
+      "UUID": {
+        "type": "string",
+        "example": "56YE2TYN2VFYRLNSHKPW5NVT5E"
+      },
+      "User": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Jack O'Neill",
+            "description": "Full name"
+          },
+          "uuid": {
+            "$ref": "#/components/schemas/UUID"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "description": "User object"
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "object",
+            "properties": {
+              "Message": {
+                "type": "string",
+                "description": "The error message."
+              }
+            }
+          }
+        }
+      },
+      "Action": {},
+      "Client": {
+        "properties": {
+          "os_name": {
+            "type": "string",
+            "example": "MacOSX"
+          },
+          "app_name": {
+            "type": "string",
+            "example": "1Password Extension"
+          },
+          "ip_address": {
+            "type": "string",
+            "example": "13.227.95.22"
+          },
+          "os_version": {
+            "type": "string",
+            "example": "10.15.6"
+          },
+          "app_version": {
+            "type": "string",
+            "example": "20127"
+          },
+          "platform_name": {
+            "type": "string",
+            "example": "Chrome"
+          },
+          "platform_version": {
+            "type": "string",
+            "description": "Depending on the platform used, this can be the version of the browser that the client extension is installed, the model of computer that the native application is installed or the machine's CPU version that the CLI was installed"
+          }
+        },
+        "description": "Metadata gathered about the client"
+      },
+      "Cursor": {
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "example": "aGVsbG8hIGlzIGl0IG1lIHlvdSBhcmUgbG9va2luZyBmb3IK",
+            "description": "Cursor to fetch more data if available or continue the polling process if required"
+          }
+        },
+        "description": "Cursor"
+      },
+      "Details": {
+        "properties": {
+          "value": {
+            "type": "string",
+            "example": "Europe",
+            "description": "For firewall prevented sign-ins, the value is the chosen continent, country, etc. that blocked the sign-in attempt"
+          }
+        },
+        "description": "Additional information about the sign-in attempt"
+      },
+      "ItemUsage": {
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "uuid": {
+            "$ref": "#/components/schemas/UUID"
+          },
+          "action": {
+            "$ref": "#/components/schemas/Action"
+          },
+          "client": {
+            "$ref": "#/components/schemas/Client"
+          },
+          "item_uuid": {
+            "$ref": "#/components/schemas/UUID"
+          },
+          "timestamp": {
+            "$ref": "#/components/schemas/DateTimeRFC3339"
+          },
+          "vault_uuid": {
+            "$ref": "#/components/schemas/UUID"
+          },
+          "used_version": {
+            "type": "integer"
+          }
+        },
+        "description": "A single item usage object"
+      },
+      "ResetCursor": {
+        "properties": {
+          "limit": {
+            "type": "number",
+            "maximum": 1000,
+            "minimum": 1
+          },
+          "end_time": {
+            "$ref": "#/components/schemas/DateTimeRFC3339"
+          },
+          "start_time": {
+            "$ref": "#/components/schemas/DateTimeRFC3339"
+          }
+        },
+        "description": "Reset cursor"
+      },
+      "Introspection": {
+        "type": "object",
+        "properties": {
+          "UUID": {
+            "type": "string"
+          },
+          "Features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "itemusages",
+              "signinattempts"
+            ]
+          },
+          "IssuedAt": {
+            "$ref": "#/components/schemas/DateTimeRFC3339"
+          }
+        }
+      },
+      "SignInAttempt": {
+        "properties": {
+          "type": {
+            "enum": [
+              "credentials_ok",
+              "mfa_ok",
+              "password_secret_bad",
+              "mfa_missing",
+              "totp_disabled",
+              "totp_bad",
+              "totp_timeout",
+              "u2f_disabled",
+              "u2f_bad",
+              "u2f_timout",
+              "duo_disabled",
+              "duo_bad",
+              "duo_timeout",
+              "duo_native_bad",
+              "platform_secret_disabled",
+              "platform_secret_bad",
+              "platform_secret_proxy",
+              "code_disabled",
+              "code_bad",
+              "code_timeout",
+              "ip_blocked",
+              "continent_blocked",
+              "country_blocked",
+              "anonymous_blocked",
+              "all_blocked",
+              "modern_version_missing",
+              "modern_version_old"
+            ],
+            "type": "string",
+            "example": "continent_blocked"
+          },
+          "uuid": {
+            "$ref": "#/components/schemas/UUID"
+          },
+          "client": {
+            "$ref": "#/components/schemas/Client"
+          },
+          "country": {
+            "type": "string",
+            "example": "France",
+            "description": "Country ISO Code"
+          },
+          "details": {
+            "$ref": "#/components/schemas/Details"
+          },
+          "category": {
+            "enum": [
+              "success",
+              "credentials_failed",
+              "mfa_failed",
+              "modern_version_failed",
+              "firewall_failed",
+              "firewall_reported_success"
+            ],
+            "type": "string",
+            "example": "firewall_failed"
+          },
+          "timestamp": {
+            "$ref": "#/components/schemas/DateTimeRFC3339"
+          },
+          "target_user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "session_uuid": {
+            "$ref": "#/components/schemas/UUID"
+          }
+        },
+        "description": "A single sign-in attempt object"
+      },
+      "ItemUsageItems": {
+        "allOf": [
+          {
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ItemUsage"
+                }
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/CursorCollection"
+          }
+        ],
+        "description": "An object wrapping cursor properties and a list of items usages"
+      },
+      "DateTimeRFC3339": {
+        "type": "string",
+        "format": "date-time",
+        "example": "2020-06-11T16:32:50-03:00"
+      },
+      "CursorCollection": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Cursor"
+          },
+          {
+            "properties": {
+              "has_more": {
+                "type": "boolean",
+                "description": "Whether there may still be more data to fetch using the returned cursor. If true, the subsequent request could still be empty."
+              }
+            }
+          }
+        ],
+        "description": "Common cursor properties for collection responses"
+      },
+      "SignInAttemptItems": {
+        "allOf": [
+          {
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SignInAttempt"
+                }
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/CursorCollection"
+          }
+        ],
+        "description": "An object wrapping cursor properties and a list of sign-in attempts"
+      }
+    },
+    "examples": {
+      "Cursor": {
+        "value": {
+          "cursor": "aGVsbG8hIGlzIGl0IG1lIHlvdSBhcmUgbG9va2luZyBmb3IK"
+        },
+        "summary": "Used for continued calling with a cursor"
+      },
+      "ResetCursor": {
+        "value": {
+          "limit": 100,
+          "start_time": "2021-06-11T16:32:50-03:00"
+        },
+        "summary": "Used for reseting the cursor"
+      }
+    },
+    "responses": {
+      "IntrospectResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Introspection"
+            }
+          }
+        },
+        "description": "Introspection object"
+      },
+      "ItemUsagesResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ItemUsageItems"
+            }
+          }
+        },
+        "description": "Item usages response object"
+      },
+      "GenericErrorResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        },
+        "description": "Generic error"
+      },
+      "SignInAttemptsResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SignInAttemptItems"
+            }
+          }
+        },
+        "description": "Sign-in attempts response object"
+      },
+      "UnauthorizedErrorResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        },
+        "description": "Unauthorized"
+      }
+    },
+    "requestBodies": {
+      "CursorRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/Cursor"
+                },
+                {
+                  "$ref": "#/components/schemas/ResetCursor"
+                }
+              ]
+            },
+            "examples": {
+              "Resetting cursor": {
+                "$ref": "#/components/examples/ResetCursor"
+              },
+              "Continuing cursor": {
+                "$ref": "#/components/examples/Cursor"
+              }
+            }
+          }
+        }
+      },
+      "ItemUsagesRequest": {
+        "$ref": "#/components/requestBodies/CursorRequest"
+      },
+      "SignInAttemptsRequest": {
+        "$ref": "#/components/requestBodies/CursorRequest"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
