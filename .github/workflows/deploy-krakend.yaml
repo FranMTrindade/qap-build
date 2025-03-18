@@ -1,0 +1,5 @@
+name: Deploy KrakenD API Gateway
+
+on:
+  push:
+    branches:
