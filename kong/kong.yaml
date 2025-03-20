@@ -1,0 +1,16 @@
+_format_version: '3.0'
+services:
+  - name: dogs-alldogs-service
+    url: https://dogapi.dog/
+    routes:
+      - name: dogs-alldogs-route
+        paths:
+          - //alldogs
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: /api/v2/breeds
