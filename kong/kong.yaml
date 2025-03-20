@@ -1,0 +1,16 @@
+_format_version: '3.0'
+services:
+  - name: css-colors-service
+    url: https://api.sampleapis.com/
+    routes:
+      - name: css-colors-route
+        paths:
+          - v1cores
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: /csscolornames/colors

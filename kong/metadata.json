@@ -1,0 +1,9 @@
+{
+  "workspace": {
+    "name": "css with kong and kraken"
+  },
+  "environment": {
+    "repository": "qap-build.git",
+    "gitUsername": "FranMTrindade"
+  }
+}
