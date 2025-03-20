@@ -1,0 +1,23 @@
+{
+  "_format_version": "3.0",
+  "services": [
+    {
+      "name": "css-service",
+      "url": "https://api.sampleapis.com/",
+      "routes": {
+        "name": "css-route",
+        "paths": "/v1/cores",
+        "strip_path": true,
+        "methods": "GET"
+      },
+      "plugins": {
+        "name": "request-transformer",
+        "config": {
+          "replace": {
+            "uri": "/csscolornames/colors"
+          }
+        }
+      }
+    }
+  ]
+}
