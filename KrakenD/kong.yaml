@@ -1,0 +1,1 @@
+"_format_version: '3.0'\nservices:\n  - name: dogs-alldogs-service\n    url: https://dogapi.dog/\n    routes:\n      - name: dogs-alldogs-route\n        paths:\n          - //alldogs\n        strip_path: true\n        methods:\n          - GET\n    plugins:\n      - name: request-transformer\n        config:\n          replace:\n            uri: /api/v2/breeds\n"
