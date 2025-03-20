@@ -1,0 +1,1 @@
+"_format_version: '3.0'\nservices:\n  - name: css-colors-service\n    url: https://api.sampleapis.com/\n    routes:\n      - name: css-colors-route\n        paths:\n          - /v1/cores\n        strip_path: true\n        methods:\n          - GET\n    plugins:\n      - name: request-transformer\n        config:\n          replace:\n            uri: /csscolornames/colors\n"
