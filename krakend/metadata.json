@@ -1,0 +1,9 @@
+{
+  "workspace": {
+    "name": "dp-api-product"
+  },
+  "environment": {
+    "repository": "qap-build.git",
+    "gitUsername": "FranMTrindade"
+  }
+}
