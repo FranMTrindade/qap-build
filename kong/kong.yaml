@@ -1,0 +1,16 @@
+_format_version: '3.0'
+services:
+  - name: api-from-scratch-objects-service
+    url: https://api.restful-api.dev
+    routes:
+      - name: api-from-scratch-objects-route
+        paths:
+          - /objects
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: //objects
