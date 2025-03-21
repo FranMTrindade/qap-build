@@ -1,0 +1,9 @@
+{
+  "workspace": {
+    "name": "dp-from-scratch"
+  },
+  "environment": {
+    "repository": "qap-build.git",
+    "gitUsername": "FranMTrindade"
+  }
+}

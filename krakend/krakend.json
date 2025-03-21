@@ -1,0 +1,45 @@
+{
+  "version": 3,
+  "name": "api-from-scratch",
+  "timeout": "5000ms",
+  "cache_ttl": "300s",
+  "output_encoding": "no-op",
+  "port": 3890,
+  "endpoints": [
+    {
+      "endpoint": "/objects",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET"
+          ],
+          "expose_headers": [
+            "*"
+          ],
+          "allow_headers": [
+            "*"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/objects",
+          "encoding": "json",
+          "sd": "static",
+          "method": "GET",
+          "host": [
+            "https://api.restful-api.dev"
+          ],
+          "disable_host_sanitize": false
+        }
+      ]
+    }
+  ]
+}
