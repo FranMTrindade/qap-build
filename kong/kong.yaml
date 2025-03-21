@@ -1,0 +1,44 @@
+_format_version: '3.0'
+services:
+  - name: api-product-series-service
+    url: https://api.cnptia.embrapa.br
+    routes:
+      - name: api-product-series-route
+        paths:
+          - /series
+        strip_path: true
+        methods:
+          - POST
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: //satveg/v2/series
+  - name: api-product-Objects-service
+    url: https://api.restful-api.dev
+    routes:
+      - name: api-product-Objects-route
+        paths:
+          - /objects
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: //objects
+  - name: api-product--service
+    url: https://ipgeolocation.abstractapi.com
+    routes:
+      - name: api-product--route
+        paths:
+          - /v1/
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: //v1/
