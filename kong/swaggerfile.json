@@ -1,0 +1,109 @@
+{
+  "info": {
+    "title": "1Forge Finance APIs",
+    "x-logo": {
+      "url": "https://api.apis.guru/v2/cache/logo/https_1forge.com_assets_images_f-blue.svg",
+      "backgroundColor": "#24292e"
+    },
+    "contact": {
+      "url": "http://1forge.com",
+      "name": "1Forge",
+      "email": "contact@1forge.com"
+    },
+    "version": "0.0.1",
+    "x-origin": [
+      {
+        "url": "http://1forge.com/openapi.json",
+        "format": "swagger",
+        "version": "2.0"
+      }
+    ],
+    "description": "Stock and Forex Data and Realtime Quotes",
+    "x-providerName": "1forge.com",
+    "x-apisguru-categories": [
+      "financial"
+    ]
+  },
+  "tags": [],
+  "paths": {
+    "/1forge-finance-apis/quotes": {
+      "get": {
+        "tags": [
+          "forex",
+          "finance",
+          "quotes"
+        ],
+        "summary": "Get quotes for all symbols",
+        "responses": {
+          "200": {
+            "description": "A list of quotes"
+          }
+        },
+        "parameters": [],
+        "description": "Get quotes",
+        "externalDocs": {
+          "url": "http://1forge.com/forex-data-api",
+          "description": "Find out more"
+        }
+      }
+    },
+    "/1forge-finance-apis/symbols": {
+      "get": {
+        "tags": [
+          "forex",
+          "finance",
+          "quotes"
+        ],
+        "summary": "Get a list of symbols for which we provide real-time quotes",
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "example": [
+                "EURUSD",
+                "GBPJPY",
+                "AUDUSD"
+              ]
+            },
+            "description": "A list of symbols"
+          }
+        },
+        "parameters": [],
+        "description": "Symbol List",
+        "externalDocs": {
+          "url": "http://1forge.com/forex-data-api",
+          "description": "Find out more"
+        }
+      }
+    }
+  },
+  "openapi": "3.0.2",
+  "servers": [
+    {
+      "url": "/",
+      "description": "Main (production) server"
+    },
+    {
+      "url": "/",
+      "description": "Internal test server"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

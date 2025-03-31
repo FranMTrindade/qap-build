@@ -1,0 +1,30 @@
+_format_version: '3.0'
+services:
+  - name: 1forge-finance-apis-quotes-service
+    url: ''
+    routes:
+      - name: 1forge-finance-apis-quotes-route
+        paths:
+          - /quotes
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: //quotes
+  - name: 1forge-finance-apis-symbols-service
+    url: ''
+    routes:
+      - name: 1forge-finance-apis-symbols-route
+        paths:
+          - /symbols
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: //symbols
