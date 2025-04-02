@@ -1,0 +1,44 @@
+_format_version: '3.0'
+services:
+  - name: events-api-signinattempts-service
+    url: https://events.1password.com
+    routes:
+      - name: events-api-signinattempts-route
+        paths:
+          - /api/v1/signinattempts
+        strip_path: true
+        methods:
+          - POST
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: //api/v1/signinattempts
+  - name: events-api-itemusages-service
+    url: https://events.1password.com
+    routes:
+      - name: events-api-itemusages-route
+        paths:
+          - /api/v1/itemusages
+        strip_path: true
+        methods:
+          - POST
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: //api/v1/itemusages
+  - name: events-api-introspect-service
+    url: https://events.1password.com
+    routes:
+      - name: events-api-introspect-route
+        paths:
+          - /api/auth/introspect
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: //api/auth/introspect
