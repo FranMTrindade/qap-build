@@ -1,0 +1,9 @@
+{
+  "workspace": {
+    "name": "newName"
+  },
+  "environment": {
+    "repository": "qap-build.git",
+    "gitUsername": "FranMTrindade"
+  }
+}
