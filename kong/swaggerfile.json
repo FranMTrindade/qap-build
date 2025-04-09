@@ -1,0 +1,243 @@
+{
+  "info": {
+    "title": "IP geolocation API",
+    "x-logo": {
+      "url": "https://api.apis.guru/v2/cache/logo/https_global-uploads.webflow.com_5ebbd0a566a3996636e55959_5ec2ba29feeeb05d69160e7b_webclip.png"
+    },
+    "version": "1.0.0",
+    "x-origin": [
+      {
+        "url": "https://documentation.abstractapi.com/ip-geolocation-openapi.json",
+        "format": "openapi",
+        "version": "3.0"
+      }
+    ],
+    "description": "Abstract IP geolocation API allows developers to retrieve the region, country and city behind any IP worldwide. The API covers the geolocation of IPv4 and IPv6 addresses in 180+ countries worldwide. Extra information can be retrieved like the currency, flag or language associated to an IP.",
+    "x-serviceName": "geolocation",
+    "x-providerName": "abstractapi.com",
+    "x-apisguru-categories": [
+      "location"
+    ]
+  },
+  "tags": [],
+  "paths": {
+    "/ip-geolocation-api/v1/": {
+      "get": {
+        "servers": [
+          {
+            "url": "https://ipgeolocation.abstractapi.com"
+          }
+        ],
+        "summary": "Retrieve V1",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"ip_address\":\"195.154.25.40\",\"city\":\"Paris\",\"city_geoname_id\":2988507,\"region\":\"Île-de-France\",\"region_iso_code\":\"IDF\",\"region_geoname_id\":3012874,\"postal_code\":\"75008\",\"country\":\"France\",\"country_code\":\"FR\",\"country_geoname_id\":3017382,\"country_is_eu\":true,\"continent\":\"Europe\",\"continent_code\":\"EU\",\"continent_geoname_id\":6255148,\"longitude\":2.4075,\"latitude\":48.8323,\"security\":{\"is_vpn\":false},\"timezone\":{\"name\":\"Europe/Paris\",\"abbreviation\":\"CEST\",\"gmt_offset\":2,\"current_time\":\"15:42:18\",\"is_dst\":true},\"flag\":{\"emoji\":\"<ë<÷\",\"unicode\":\"U+1F1EB U+1F1F7\",\"png\":\"https://static.abstractapi.com/country-flags/FR_flag.png\",\"svg\":\"https://static.abstractapi.com/country-flags/FR_flag.svg\"},\"currency\":{\"currency_name\":\"Euros\",\"currency_code\":\"EUR\"},\"connection\":{\"autonomous_system_number\":12876,\"autonomous_system_organization\":\"Online S.a.s.\",\"connection_type\":\"Corporate\",\"isp_name\":\"Online S.A.S.\",\"organization_name\":\"ONLINE\"}}"
+                  }
+                }
+              }
+            },
+            "description": "Location of geolocated IP"
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "api_key",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            },
+            "explode": true,
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "ip_address",
+            "style": "form",
+            "schema": {
+              "type": "string",
+              "example": "195.154.25.40"
+            },
+            "explode": true,
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "fields",
+            "style": "form",
+            "schema": {
+              "type": "string",
+              "example": "country,city,timezone"
+            },
+            "explode": true,
+            "required": false
+          }
+        ],
+        "description": "Retrieve the location of an IP address"
+      }
+    }
+  },
+  "openapi": "3.0.1",
+  "servers": [
+    {
+      "url": "/",
+      "description": "Main (production) server"
+    },
+    {
+      "url": "/",
+      "description": "Internal test server"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "components": {
+    "schemas": {
+      "inline_response_200": {
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": "string"
+          },
+          "flag": {
+            "type": "object",
+            "properties": {
+              "png": {
+                "type": "string"
+              },
+              "svg": {
+                "type": "string"
+              },
+              "emoji": {
+                "type": "string"
+              },
+              "unicode": {
+                "type": "string"
+              }
+            }
+          },
+          "region": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "object",
+            "properties": {
+              "currency_code": {
+                "type": "string"
+              },
+              "currency_name": {
+                "type": "string"
+              }
+            }
+          },
+          "latitude": {
+            "type": "number"
+          },
+          "security": {
+            "type": "object",
+            "properties": {
+              "is_vpn": {
+                "type": "boolean"
+              }
+            }
+          },
+          "timezone": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "is_dst": {
+                "type": "boolean"
+              },
+              "gmt_offset": {
+                "type": "integer"
+              },
+              "abbreviation": {
+                "type": "string"
+              },
+              "current_time": {
+                "type": "string"
+              }
+            }
+          },
+          "continent": {
+            "type": "string"
+          },
+          "longitude": {
+            "type": "number"
+          },
+          "connection": {
+            "type": "object",
+            "properties": {
+              "isp_name": {
+                "type": "string"
+              },
+              "connection_type": {
+                "type": "string"
+              },
+              "organization_name": {
+                "type": "string"
+              },
+              "autonomous_system_number": {
+                "type": "integer"
+              },
+              "autonomous_system_organization": {
+                "type": "string"
+              }
+            }
+          },
+          "ip_address": {
+            "type": "string"
+          },
+          "postal_code": {
+            "type": "string"
+          },
+          "country_code": {
+            "type": "string"
+          },
+          "country_is_eu": {
+            "type": "boolean"
+          },
+          "continent_code": {
+            "type": "string"
+          },
+          "city_geoname_id": {
+            "type": "integer"
+          },
+          "region_iso_code": {
+            "type": "string"
+          },
+          "region_geoname_id": {
+            "type": "integer"
+          },
+          "country_geoname_id": {
+            "type": "integer"
+          },
+          "continent_geoname_id": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

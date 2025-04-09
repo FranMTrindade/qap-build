@@ -1,0 +1,16 @@
+_format_version: '3.0'
+services:
+  - name: events-api--service
+    url: https://ipgeolocation.abstractapi.com
+    routes:
+      - name: events-api--route
+        paths:
+          - /v1/
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: //v1/
