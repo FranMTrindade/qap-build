@@ -1,0 +1,30 @@
+_format_version: '3.0'
+services:
+  - name: events-api-specialties-service
+    url: https://medical-api.on.qriarlabs.com
+    routes:
+      - name: events-api-specialties-route
+        paths:
+          - /medical-api/specialties
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: //specialties
+  - name: events-api-Doctors-service
+    url: https://medical-api.on.qriarlabs.com
+    routes:
+      - name: events-api-Doctors-route
+        paths:
+          - /medical-api/doctors
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: //doctors
