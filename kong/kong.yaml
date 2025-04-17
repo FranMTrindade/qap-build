@@ -1,0 +1,30 @@
+_format_version: '3.0'
+services:
+  - name: events-api-objects-service
+    url: https://api.restful-api.dev
+    routes:
+      - name: events-api-objects-route
+        paths:
+          - /from-scratch/objects
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: //objects
+  - name: events-api-breeds-service
+    url: https://api.petcare.com
+    routes:
+      - name: events-api-breeds-route
+        paths:
+          - /petcare-api/breeds
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: //v1/breeds
