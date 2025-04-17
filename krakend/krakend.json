@@ -1,0 +1,115 @@
+{
+  "version": 3,
+  "name": "events-api",
+  "timeout": "5000ms",
+  "cache_ttl": "300s",
+  "output_encoding": "no-op",
+  "port": 3890,
+  "endpoints": [
+    {
+      "endpoint": "/from-scratch/appointments",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET"
+          ],
+          "expose_headers": [
+            "*"
+          ],
+          "allow_headers": [
+            "*"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/appointments",
+          "encoding": "json",
+          "sd": "static",
+          "method": "GET",
+          "host": [
+            "https://medical-api.on.qriarlabs.com"
+          ],
+          "disable_host_sanitize": false
+        }
+      ]
+    },
+    {
+      "endpoint": "/from-scratch/objects",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET"
+          ],
+          "expose_headers": [
+            "*"
+          ],
+          "allow_headers": [
+            "*"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/objects",
+          "encoding": "json",
+          "sd": "static",
+          "method": "GET",
+          "host": [
+            "https://api.restful-api.dev"
+          ],
+          "disable_host_sanitize": false
+        }
+      ]
+    },
+    {
+      "endpoint": "/from-scratch/operations",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET"
+          ],
+          "expose_headers": [
+            "*"
+          ],
+          "allow_headers": [
+            "*"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/operations",
+          "encoding": "json",
+          "sd": "static",
+          "method": "GET",
+          "host": [
+            "http://openbanking-sample.on.qriarlabs.com"
+          ],
+          "disable_host_sanitize": false
+        }
+      ]
+    }
+  ]
+}

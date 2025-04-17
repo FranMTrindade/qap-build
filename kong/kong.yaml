@@ -1,0 +1,44 @@
+_format_version: '3.0'
+services:
+  - name: events-api-Appointments-service
+    url: https://medical-api.on.qriarlabs.com
+    routes:
+      - name: events-api-Appointments-route
+        paths:
+          - /from-scratch/appointments
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: //appointments
+  - name: events-api-objects-service
+    url: https://api.restful-api.dev
+    routes:
+      - name: events-api-objects-route
+        paths:
+          - /from-scratch/objects
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: //objects
+  - name: events-api-operations-service
+    url: http://openbanking-sample.on.qriarlabs.com
+    routes:
+      - name: events-api-operations-route
+        paths:
+          - /from-scratch/operations
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: //operations
