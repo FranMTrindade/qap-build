@@ -1,0 +1,87 @@
+name: QAP Workspace Container Build Workflow
+
+on:
+    push:
+        branches:
+            - '*'
+
+jobs:
+    check-config:
+        runs-on: ubuntu-latest
+        steps:
+            - name: checkout code
+              uses: actions/checkout@v4
+        
+            - name: Test
+              run: |
+                echo "Runner working on path $PWD"
+                docker run --rm -v $PWD/krakend:/config devopsfaith/krakend:2.5.0 check -tdc /config/gatewayFile.json
+                # docker run --rm -v $PWD/krakend:/config devopsfaith/krakend:2.5.0 check --lint -c /config/gatewayFile.json
+                # docker run --rm -v $PWD/krakend:/config devopsfaith/krakend:2.5.0 audit -c /config/gatewayFile.json --severity CRITICAL,HIGH
+                echo "--------------------------------------------------"
+                echo "------ YOU ROCK! KrakenD config looks good! ------"
+                echo "--------------------------------------------------"
+        
+    docker-build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+            
+            - name: Login to Google Artifact Registry
+              uses: docker/login-action@v3
+              with:
+                  registry: us-east1-docker.pkg.dev
+                  username: _json_key
+                  password: ${{ secrets.GCP_SA_KEY }}
+            
+            - name: Build and push Docker image
+              run: |
+                docker build -t ${{ secrets.CI_REGISTRY_IMAGE }}:${{ github.sha }} -f krakend/Dockerfile .
+                docker push ${{ secrets.CI_REGISTRY_IMAGE }}:${{ github.sha }}
+    
+    deploy:
+        needs: docker-build
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
+
+          - name: Authenticate with Google Cloud
+            uses: google-github-actions/auth@v2
+            with:
+              credentials_json: '${{ secrets.GCP_SA_KEY }}'
+              token_format: access_token
+              export_environment_variables: true
+    
+          - name: Set up Cloud SDK
+            uses: google-github-actions/setup-gcloud@v2
+    
+          - name: Configure Docker for Google Artifact Registry
+            run: gcloud auth configure-docker us-east1-docker.pkg.dev
+    
+          - name: Deploy to Cloud Run
+            run: |
+              gcloud run deploy ${{ secrets.CLOUD_RUN_SERVICE }} \
+                --image ${{ secrets.CI_REGISTRY_IMAGE }}:${{ github.sha }} \
+                --region ${{ secrets.CLOUD_RUN_REGION }} \
+                --platform managed
+
+          - name: Get Cloud Run URL
+            id: cloud_run_url
+            run: |
+              url=$(gcloud run services describe ${{ secrets.CLOUD_RUN_SERVICE }}                 --format 'value(status.url)'                 --region ${{ secrets.CLOUD_RUN_REGION }}                 --platform managed)
+              echo "::set-output name=url::$url"
+
+          - name: Use Cloud Run URL
+            run: |
+              echo "The Cloud Run URL is ${{ steps.cloud_run_url.outputs.url }}"
+
+          - name: Send Webhook
+            run: |
+              curl -X POST http://localhost:5002/v2/api/webhook               -H "Content-Type: application/json"               -d '{
+                  "url": "${{ steps.cloud_run_url.outputs.url }}",
+                  "api": "from-scratch"
+                  "deploymentUnitKey": deployment_unit_dp gov_key
+                }'
+
