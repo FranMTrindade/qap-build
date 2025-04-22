@@ -1,0 +1,16 @@
+_format_version: '3.0'
+services:
+  - name: events-api-New route-service
+    url: https://api.sampleapis.com/
+    routes:
+      - name: events-api-New route-route
+        paths:
+          - /price
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: /csscolornames/colors
