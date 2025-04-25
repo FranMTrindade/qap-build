@@ -1,0 +1,9 @@
+FROM devopsfaith/krakend:2.7.0
+
+# CP Plugin
+COPY ./plugins/qap-krakend-plugin.so /etc/krakend/plugins/
+
+# CP qapgateway config 
+COPY ./qap-gateway.json /etc/krakend/qap-gateway.json
+
+CMD ["run", "-c", "/etc/krakend/krakend.json"]
