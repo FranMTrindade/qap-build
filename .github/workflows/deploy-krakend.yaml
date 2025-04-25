@@ -1,0 +1,44 @@
+name: Deploy KrakenD, Kong & QAP Gateway
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "krakend/krakend.json"
+      - "kong/**"
+      - "qapgateway/**"
+      - "qap-gateway/**"
+
+jobs:
+  set-flags:
+    runs-on: ubuntu-latest
+    outputs:
+      krakend_enabled: ${{ steps.set-flags.outputs.krakend_enabled }}
+      kong_enabled: ${{ steps.set-flags.outputs.kong_enabled }}
+      qap_gateway_enabled: ${{ steps.set-flags.outputs.qap_gateway_enabled }}
+
+    steps:
+      - name: Notify QAP Admin - Init CI
+        run: |
+          curl --location '${process.env.NEST_WEBHOOK_URL}' \
+            --header 'Content-Type: application/json' \
+            --data '{
+              "url": "https://deployment_unit_testeqapgw_key.on.qriarlabs.com",
+              "api": "css",
+              "deploymentUnit": "deployment_unit_testeqapgw_key",
+              "ciStatus": "Init CI"
+            }'
+
+      - name: Set flags for KrakenD, Kong, and QAP Gateway
+        id: set-flags
+        run: |
+          if [ -n "${{ secrets.KRAKEND_CAPROVER_APP_NAME }}" ]; then
+            echo "krakend_enabled=true" >> $GITHUB_OUTPUT
+          fi
+          if [ -n "${{ secrets.KONG_CAPROVER_APP_NAME }}" ]; then
+            echo "kong_enabled=true" >> $GITHUB_OUTPUT
+          fi
+          if [ -n "${{ secrets.QAP_GATEWAY_CAPROVER_APP_NAME }}" ]; then
+            echo "qap_gateway_enabled=true" >> $GITHUB_OUTPUT
+          fi
