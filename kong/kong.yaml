@@ -1,0 +1,44 @@
+_format_version: '3.0'
+services:
+  - name: telco-api-SMS Balance-service
+    url: https://google.com
+    routes:
+      - name: telco-api-SMS Balance-route
+        paths:
+          - /telco-api/sms-balance
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: /search
+  - name: telco-api-Send SMS-service
+    url: https://www.google.com/
+    routes:
+      - name: telco-api-Send SMS-route
+        paths:
+          - /telco-api/send-sms
+        strip_path: true
+        methods:
+          - POST
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: /search
+  - name: telco-api-SMS Balance-service
+    url: https://google.com
+    routes:
+      - name: telco-api-SMS Balance-route
+        paths:
+          - /telco-api/sms-balance
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: /search
