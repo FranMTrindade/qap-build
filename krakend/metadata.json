@@ -1,0 +1,9 @@
+{
+  "workspace": {
+    "name": "Medical-DP"
+  },
+  "environment": {
+    "repository": "qap-build.git",
+    "gitUsername": "FranMTrindade"
+  }
+}
