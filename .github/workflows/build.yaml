@@ -1,0 +1,181 @@
+name: Deploy KrakenD, Kong & QAP Gateway
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "krakend/krakend.json"
+      - "kong/**"
+      - "qapgateway/**"
+      - "qap-gateway/**"
+
+jobs:
+  set-flags:
+    runs-on: ubuntu-latest
+    outputs:
+      krakend_enabled: ${{ steps.set-flags.outputs.krakend_enabled }}
+      kong_enabled: ${{ steps.set-flags.outputs.kong_enabled }}
+      qap_gateway_enabled: ${{ steps.set-flags.outputs.qap_gateway_enabled }}
+
+    steps:
+      - name: Notify QAP Admin - Init CI
+        run: |
+          curl --location 'https://quantum-admin-api-dev.konneqt.cloud/webhook' \
+            --header 'Content-Type: application/json' \
+            --data '{
+              "url": "https://deployment_unit_medical_key.on.qriarlabs.com",
+              "api": "medical-api",
+              "deploymentUnit": "deployment_unit_medical_key",
+              "ciStatus": "Init CI"
+            }'
+
+      - name: Set flags for KrakenD, Kong, and QAP Gateway
+        id: set-flags
+        run: |
+          if [ -n "${{ secrets.KRAKEND_CAPROVER_APP_NAME }}" ]; then
+            echo "krakend_enabled=true" >> $GITHUB_OUTPUT
+          fi
+          if [ -n "${{ secrets.KONG_CAPROVER_APP_NAME }}" ]; then
+            echo "kong_enabled=true" >> $GITHUB_OUTPUT
+          fi
+          if [ -n "${{ secrets.QAPGATEWAY_CAPROVER_APP_NAME }}" ]; then
+            echo "qap_gateway_enabled=true" >> $GITHUB_OUTPUT
+          fi
+
+  krakend-deploy:
+    needs: set-flags
+    if: needs.set-flags.outputs.krakend_enabled == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+
+      - name: Set Image Name - KrakenD
+        run: echo "IMAGE_NAME=${{ secrets.REGISTRY_USER }}/deployment_unit_medical_key_krakend:latest" >> $GITHUB_ENV
+
+      - name: Build KrakenD Docker Image
+        run: docker build -t $IMAGE_NAME -f ./krakend/dockerfile .
+
+      - name: Push KrakenD Docker Image
+        run: docker push $IMAGE_NAME
+
+      - name: Deploy KrakenD to CapRover
+        uses: caprover/deploy-from-github@v1.1.2
+        with:
+          server: ${{ secrets.CAPROVER_SERVER }}
+          app: ${{ secrets.KRAKEND_CAPROVER_APP_NAME }}
+          token: ${{ secrets.KRAKEND_CAPROVER_TOKEN }}
+          image: "${{ secrets.REGISTRY_USER }}/deployment_unit_medical_key_krakend:latest"
+
+      - name: Notify QAP Admin - DEPLOYED
+        run: |
+          curl --location 'https://quantum-admin-api-dev.konneqt.cloud/webhook' \
+            --header 'Content-Type: application/json' \
+            --data '{
+              "url": "https://deployment_unit_medical_key.on.qriarlabs.com",
+              "api": "medical-api",
+              "deploymentUnit": "deployment_unit_medical_key",
+              "ciStatus": "DEPLOYED"
+            }'
+
+  kong-deploy:
+    needs: set-flags
+    if: needs.set-flags.outputs.kong_enabled == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+
+      - name: Set Image Name - Kong
+        run: echo "KONG_IMAGE_NAME=${{ secrets.REGISTRY_USER }}/deployment_unit_medical_key_kong:latest" >> $GITHUB_ENV
+
+      - name: Build Kong Docker Image
+        run: docker build -t $KONG_IMAGE_NAME -f ./kong/dockerfile .
+
+      - name: Push Kong Docker Image
+        run: docker push $KONG_IMAGE_NAME
+
+      - name: Deploy Kong to CapRover
+        uses: caprover/deploy-from-github@v1.1.2
+        with:
+          server: ${{ secrets.CAPROVER_SERVER }}
+          app: ${{ secrets.KONG_CAPROVER_APP_NAME }}
+          token: ${{ secrets.KONG_CAPROVER_TOKEN }}
+          image: "${{ secrets.REGISTRY_USER }}/deployment_unit_medical_key_kong:latest"
+
+      - name: Notify QAP Admin - DEPLOYED
+        run: |
+          curl --location 'https://quantum-admin-api-dev.konneqt.cloud/webhook' \
+            --header 'Content-Type: application/json' \
+            --data '{
+              "url": "https://deployment_unit_medical_key.on.qriarlabs.com",
+              "api": "medical-api",
+              "deploymentUnit": "deployment_unit_medical_key",
+              "ciStatus": "DEPLOYED"
+            }'
+
+  qap-gateway-deploy:
+    needs: set-flags
+    if: needs.set-flags.outputs.qap_gateway_enabled == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build QAP Plugin
+        run: |
+          mkdir -p qapgateway/plugins
+          docker run --rm -v "$(pwd)/qapgateway:/app" -w /app krakend/builder:2.7.0 \
+            go build -buildmode=plugin -o plugins/qap-krakend-plugin.so .
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+
+      - name: Set Image Name - QAP Gateway
+        run: echo "QAP_IMAGE_NAME=${{ secrets.REGISTRY_USER }}/deployment_unit_medical_key_qap_gateway:latest" >> $GITHUB_ENV
+
+      - name: Build Docker Image - QAP Gateway
+        run: |
+          docker build \
+            --build-arg NATS_URL=${{ secrets.NATS_URL }} \
+            --build-arg NATS_TOKEN=${{ secrets.NATS_TOKEN }} \
+            --build-arg NATS_QUEUE_QAP=${{ secrets.NATS_QUEUE_QAP }} \
+            --build-arg NATS_QUEUE_ANALYTICS=${{ secrets.NATS_QUEUE_ANALYTICS }} \
+            --build-arg ENDPOINT_CHECK=${{ secrets.ENDPOINT_CHECK }} \
+            -t $QAP_IMAGE_NAME \
+            -f ./qapgateway/dockerfile ./qapgateway
+
+      - name: Push Docker Image - QAP Gateway
+        run: docker push $QAP_IMAGE_NAME
+
+      - name: Deploy QAP Gateway to CapRover
+        uses: caprover/deploy-from-github@v1.1.2
+        with:
+          server: ${{ secrets.CAPROVER_SERVER }}
+          app: ${{ secrets.QAPGATEWAY_CAPROVER_APP_NAME }}
+          token: ${{ secrets.QAPGATEWAY_CAPROVER_TOKEN }}
+          image: "${{ secrets.REGISTRY_USER }}/deployment_unit_medical_key_qap_gateway:latest"
+
+      - name: Notify QAP Admin - DEPLOYED
+        run: |
+          curl --location 'https://quantum-admin-api-dev.konneqt.cloud/webhook' \
+            --header 'Content-Type: application/json' \
+            --data '{
+              "url": "https://deployment_unit_medical_key.on.qriarlabs.com",
+              "api": "medical-api",
+              "deploymentUnit": "deployment_unit_medical_key",
+              "ciStatus": "DEPLOYED"
+            }'

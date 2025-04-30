@@ -1,0 +1,16 @@
+_format_version: '3.0'
+services:
+  - name: medical-api-Specialties-service
+    url: https://medical-api.on.qriarlabs.com/
+    routes:
+      - name: medical-api-Specialties-route
+        paths:
+          - /medical-api/specialties
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: /specialties
