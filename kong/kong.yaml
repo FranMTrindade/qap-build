@@ -1,0 +1,30 @@
+_format_version: '3.0'
+services:
+  - name: from-scratch-objects-service
+    url: https://api.restful-api.dev
+    routes:
+      - name: from-scratch-objects-route
+        paths:
+          - /from-scratch/objects
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: /objects
+  - name: from-scratch-operations-service
+    url: http://openbanking-sample.on.qriarlabs.com
+    routes:
+      - name: from-scratch-operations-route
+        paths:
+          - /from-scratch/operations
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: /operations
