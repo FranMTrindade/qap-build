@@ -1,0 +1,136 @@
+{
+  "version": 3,
+  "name": "events-api",
+  "timeout": "5000ms",
+  "cache_ttl": "300s",
+  "output_encoding": "no-op",
+  "port": 3890,
+  "endpoints": [
+    {
+      "endpoint": "/api/v1/signinattempts",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET",
+            "HEAD",
+            "POST"
+          ],
+          "expose_headers": [
+            "Content-Length",
+            "Content-Type"
+          ],
+          "allow_headers": [
+            "Accept-Language"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v1/signinattempts",
+          "encoding": "no-op",
+          "sd": "static",
+          "method": "POST",
+          "cache_ttl": "300s",
+          "host": [
+            "https://events.1password.com",
+            "https://events.1password.ca",
+            "https://events.1password.eu",
+            "https://events.ent.1password.com"
+          ],
+          "disable_host_sanitize": false
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/itemusages",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET",
+            "HEAD",
+            "POST"
+          ],
+          "expose_headers": [
+            "Content-Length",
+            "Content-Type"
+          ],
+          "allow_headers": [
+            "Accept-Language"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v1/itemusages",
+          "encoding": "no-op",
+          "sd": "static",
+          "method": "POST",
+          "cache_ttl": "300s",
+          "host": [
+            "https://events.1password.com",
+            "https://events.1password.ca",
+            "https://events.1password.eu",
+            "https://events.ent.1password.com"
+          ],
+          "disable_host_sanitize": false
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/auth/introspect",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET",
+            "HEAD",
+            "POST"
+          ],
+          "expose_headers": [
+            "Content-Length",
+            "Content-Type"
+          ],
+          "allow_headers": [
+            "Accept-Language"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/auth/introspect",
+          "encoding": "no-op",
+          "sd": "static",
+          "method": "GET",
+          "cache_ttl": "300s",
+          "host": [
+            "https://events.1password.com",
+            "https://events.1password.ca",
+            "https://events.1password.eu",
+            "https://events.ent.1password.com"
+          ],
+          "disable_host_sanitize": false
+        }
+      ]
+    }
+  ]
+}
