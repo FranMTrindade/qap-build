@@ -1,0 +1,9 @@
+{
+  "workspace": {
+    "name": "t2header"
+  },
+  "environment": {
+    "repository": "qap-build.git",
+    "gitUsername": "FranMTrindade"
+  }
+}
