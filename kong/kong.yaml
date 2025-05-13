@@ -1,0 +1,16 @@
+_format_version: '3.0'
+services:
+  - name: weather-wise-New route-service
+    url: '333'
+    routes:
+      - name: weather-wise-New route-route
+        paths:
+          - /weather-wise/333
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: /33
