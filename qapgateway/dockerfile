@@ -1,0 +1,23 @@
+FROM devopsfaith/krakend:2.7.0
+
+# Build Arguments
+ARG NATS_URL
+ARG NATS_TOKEN
+ARG NATS_QUEUE_QAP
+ARG NATS_QUEUE_ANALYTICS
+ARG ENDPOINT_CHECK
+
+# Environment Variables
+ENV NATS_URL=${NATS_URL}
+ENV NATS_TOKEN=${NATS_TOKEN}
+ENV NATS_QUEUE_QAP=${NATS_QUEUE_QAP}
+ENV NATS_QUEUE_ANALYTICS=${NATS_QUEUE_ANALYTICS}
+ENV ENDPOINT_CHECK=${ENDPOINT_CHECK}
+
+# CP Plugin
+COPY ./plugins/qap-krakend-plugin.so /etc/krakend/plugins/
+
+# CP qapgateway config
+COPY ./qap-gateway.json /etc/krakend/krakend.json
+
+CMD ["run", "-c", "/etc/krakend/krakend.json"]
