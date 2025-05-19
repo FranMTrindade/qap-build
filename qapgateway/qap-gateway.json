@@ -1,0 +1,194 @@
+{
+  "version": 3,
+  "name": "travelexplore-api",
+  "output_encoding": "no-op",
+  "timeout": "5000ms",
+  "cache_ttl": "300s",
+  "port": 8080,
+  "plugin": {
+    "pattern": ".so",
+    "folder": "/etc/krakend/plugins/"
+  },
+  "endpoints": [
+    {
+      "endpoint": "/travelexplore-api/accommodations",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": [
+        "X-User-Email"
+      ],
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET",
+            "HEAD",
+            "POST"
+          ],
+          "expose_headers": [
+            "Content-Length",
+            "Content-Type"
+          ],
+          "allow_headers": [
+            "Accept-Language"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        },
+        "proxy": {
+          "sequential": true
+        },
+        "validation/cel": [
+          {
+            "check_expr": "size(req_headers[\"X-User-Email\"]) == 1",
+            "error_message": "Missing required header: X-User-Email"
+          }
+        ],
+        "error": {
+          "return_status_code": 400,
+          "return_body": true
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/v1/accommodations",
+          "encoding": "no-op",
+          "sd": "static",
+          "method": "GET",
+          "host": [
+            "https://api.travelexplore.com"
+          ],
+          "disable_host_sanitize": false,
+          "extra_config": {
+            "plugin/http-client": {
+              "name": "qap-krakend-plugin",
+              "gateway_name": "travelexplore-api"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/travelexplore-api/destinations/{destinationId}",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": [
+        "X-User-Email"
+      ],
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET",
+            "HEAD",
+            "POST"
+          ],
+          "expose_headers": [
+            "Content-Length",
+            "Content-Type"
+          ],
+          "allow_headers": [
+            "Accept-Language"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        },
+        "proxy": {
+          "sequential": true
+        },
+        "validation/cel": [
+          {
+            "check_expr": "size(req_headers[\"X-User-Email\"]) == 1",
+            "error_message": "Missing required header: X-User-Email"
+          }
+        ],
+        "error": {
+          "return_status_code": 400,
+          "return_body": true
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/v1/destinations/{destinationId}",
+          "encoding": "no-op",
+          "sd": "static",
+          "method": "GET",
+          "host": [
+            "https://api.travelexplore.com"
+          ],
+          "disable_host_sanitize": false,
+          "extra_config": {
+            "plugin/http-client": {
+              "name": "qap-krakend-plugin",
+              "gateway_name": "travelexplore-api"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/travelexplore-api/destinations",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": [
+        "X-User-Email"
+      ],
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET",
+            "POST",
+            "HEAD"
+          ],
+          "expose_headers": [
+            "Content-Length",
+            "Content-Type"
+          ],
+          "allow_headers": [
+            "Accept-Language"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        },
+        "proxy": {
+          "sequential": true
+        },
+        "validation/cel": [
+          {
+            "check_expr": "size(req_headers[\"X-User-Email\"]) == 1",
+            "error_message": "Missing required header: X-User-Email"
+          }
+        ],
+        "error": {
+          "return_status_code": 400,
+          "return_body": true
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/v1/destinations",
+          "encoding": "no-op",
+          "sd": "static",
+          "method": "GET",
+          "host": [
+            "https://api.travelexplore.com"
+          ],
+          "disable_host_sanitize": false,
+          "extra_config": {
+            "plugin/http-client": {
+              "name": "qap-krakend-plugin",
+              "gateway_name": "travelexplore-api"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
