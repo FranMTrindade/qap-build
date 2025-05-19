@@ -1,0 +1,128 @@
+{
+  "version": 3,
+  "name": "medical-api",
+  "output_encoding": "no-op",
+  "timeout": "5000ms",
+  "cache_ttl": "300s",
+  "port": 8080,
+  "plugin": {
+    "pattern": ".so",
+    "folder": "/etc/krakend/plugins/"
+  },
+  "endpoints": [
+    {
+      "endpoint": "/medical-api/specialties",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": [
+        "X-User-Email"
+      ],
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET"
+          ],
+          "expose_headers": [
+            "*"
+          ],
+          "allow_headers": [
+            "*"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        },
+        "proxy": {
+          "sequential": true
+        },
+        "validation/cel": [
+          {
+            "check_expr": "size(req_headers[\"X-User-Email\"]) == 1",
+            "error_message": "Missing required header: X-User-Email"
+          }
+        ],
+        "error": {
+          "return_status_code": 400,
+          "return_body": true
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/specialties",
+          "encoding": "json",
+          "sd": "static",
+          "method": "GET",
+          "host": [
+            "https://medical-api.on.qriarlabs.com"
+          ],
+          "disable_host_sanitize": false,
+          "extra_config": {
+            "plugin/http-client": {
+              "name": "qap-krakend-plugin",
+              "gateway_name": "medical-api"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/medical-api/doctors",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": [
+        "X-User-Email"
+      ],
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET"
+          ],
+          "expose_headers": [
+            "*"
+          ],
+          "allow_headers": [
+            "*"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        },
+        "proxy": {
+          "sequential": true
+        },
+        "validation/cel": [
+          {
+            "check_expr": "size(req_headers[\"X-User-Email\"]) == 1",
+            "error_message": "Missing required header: X-User-Email"
+          }
+        ],
+        "error": {
+          "return_status_code": 400,
+          "return_body": true
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/doctors",
+          "encoding": "json",
+          "sd": "static",
+          "method": "GET",
+          "host": [
+            "https://medical-api.on.qriarlabs.com"
+          ],
+          "disable_host_sanitize": false,
+          "extra_config": {
+            "plugin/http-client": {
+              "name": "qap-krakend-plugin",
+              "gateway_name": "medical-api"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
