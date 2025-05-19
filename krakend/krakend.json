@@ -1,0 +1,127 @@
+{
+  "version": 3,
+  "name": "musicstream-api",
+  "timeout": "5000ms",
+  "cache_ttl": "300s",
+  "output_encoding": "no-op",
+  "port": 3890,
+  "endpoints": [
+    {
+      "endpoint": "/musicstream-api/songs",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET",
+            "HEAD",
+            "POST"
+          ],
+          "expose_headers": [
+            "Content-Length",
+            "Content-Type"
+          ],
+          "allow_headers": [
+            "Accept-Language"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/v1/songs",
+          "encoding": "no-op",
+          "sd": "static",
+          "method": "GET",
+          "cache_ttl": "300s",
+          "host": [
+            "https://api.musicstream.com"
+          ],
+          "disable_host_sanitize": false
+        }
+      ]
+    },
+    {
+      "endpoint": "/musicstream-api/playlists",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET",
+            "HEAD",
+            "POST"
+          ],
+          "expose_headers": [
+            "Content-Length",
+            "Content-Type"
+          ],
+          "allow_headers": [
+            "Accept-Language"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/v1/playlists",
+          "encoding": "no-op",
+          "sd": "static",
+          "method": "GET",
+          "cache_ttl": "300s",
+          "host": [
+            "https://api.musicstream.com"
+          ],
+          "disable_host_sanitize": false
+        }
+      ]
+    },
+    {
+      "endpoint": "/musicstream-api/songs/{songId}",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET",
+            "HEAD",
+            "POST"
+          ],
+          "expose_headers": [
+            "Content-Length",
+            "Content-Type"
+          ],
+          "allow_headers": [
+            "Accept-Language"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/v1/songs/{songId}",
+          "encoding": "no-op",
+          "sd": "static",
+          "method": "GET",
+          "cache_ttl": "300s",
+          "host": [
+            "https://api.musicstream.com"
+          ],
+          "disable_host_sanitize": false
+        }
+      ]
+    }
+  ]
+}
