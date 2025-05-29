@@ -1,0 +1,30 @@
+_format_version: '3.0'
+services:
+  - name: tvcs-destinations-service
+    url: https://api.travelexplore.com
+    routes:
+      - name: tvcs-destinations-route
+        paths:
+          - /tvcs/travelexplore-api/destinations
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: /v1/destinations
+  - name: tvcs-cores-service
+    url: https://api.sampleapis.com
+    routes:
+      - name: tvcs-cores-route
+        paths:
+          - /tvcs/css/cores
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: /csscolornames/colors
