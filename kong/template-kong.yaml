@@ -1,0 +1,16 @@
+_format_version: '3.0'
+services:
+  - name: cores-css-service
+    url: https://api.sampleapis.com
+    routes:
+      - name: cores-css-route
+        paths:
+          - /cores/css
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: /csscolornames/colors
