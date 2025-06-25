@@ -1,0 +1,62 @@
+{
+  "info": {
+    "title": "User API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/login": {
+      "post": {
+        "summary": "Login",
+        "responses": {
+          "200": {
+            "description": "Successful login"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  },
+                  "username": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/users/{userId}": {
+      "get": {
+        "summary": "Get user by ID",
+        "responses": {
+          "200": {
+            "description": "A user object"
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      }
+    }
+  },
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ]
+}
