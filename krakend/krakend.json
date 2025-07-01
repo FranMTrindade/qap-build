@@ -1,0 +1,45 @@
+{
+  "version": 3,
+  "name": "dogs",
+  "timeout": "5000ms",
+  "cache_ttl": "300s",
+  "output_encoding": "no-op",
+  "port": 3890,
+  "endpoints": [
+    {
+      "endpoint": "/dogs/new",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET"
+          ],
+          "expose_headers": [
+            "*"
+          ],
+          "allow_headers": [
+            "*"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/breeds/image/random",
+          "encoding": "json",
+          "sd": "static",
+          "method": "GET",
+          "host": [
+            "https://dog.ceo"
+          ],
+          "disable_host_sanitize": false
+        }
+      ]
+    }
+  ]
+}
