@@ -1,0 +1,227 @@
+{
+  "version": 3,
+  "name": "api-terra",
+  "output_encoding": "no-op",
+  "timeout": "5000ms",
+  "cache_ttl": "300s",
+  "port": 8080,
+  "plugin": {
+    "pattern": ".so",
+    "folder": "/etc/krakend/plugins/"
+  },
+  "endpoints": [
+    {
+      "endpoint": "/api-terra/new-route123",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": [
+        "Authorization",
+        "X-User",
+        "X-Roles"
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "https://idp.konneqt.cloud/realms/qap-dev/protocol/openid-connect/certs",
+          "propagate_claims": [
+            [
+              "sub",
+              "X-User"
+            ],
+            [
+              "realm_access.roles",
+              "X-Roles"
+            ]
+          ],
+          "propagate_headers": [
+            "Authorization"
+          ]
+        },
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET"
+          ],
+          "expose_headers": [
+            "*"
+          ],
+          "allow_headers": [
+            "*"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        },
+        "proxy": {
+          "sequential": true
+        },
+        "error": {
+          "return_status_code": 400,
+          "return_body": true
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/objects",
+          "encoding": "json",
+          "sd": "static",
+          "method": "GET",
+          "host": [
+            "https://api.restful-api.dev"
+          ],
+          "disable_host_sanitize": false,
+          "extra_config": {
+            "plugin/http-client": {
+              "name": "qap-krakend-plugin",
+              "gateway_name": "api-terra",
+              "endpoint": "/api-terra/new-route123"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api-terra/solo2",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": [
+        "Authorization",
+        "X-User",
+        "X-Roles"
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "https://idp.konneqt.cloud/realms/qap-dev/protocol/openid-connect/certs",
+          "propagate_claims": [
+            [
+              "sub",
+              "X-User"
+            ],
+            [
+              "realm_access.roles",
+              "X-Roles"
+            ]
+          ],
+          "propagate_headers": [
+            "Authorization"
+          ]
+        },
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET"
+          ],
+          "expose_headers": [
+            "*"
+          ],
+          "allow_headers": [
+            "*"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        },
+        "proxy": {
+          "sequential": true
+        },
+        "error": {
+          "return_status_code": 400,
+          "return_body": true
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/objects",
+          "encoding": "json",
+          "sd": "static",
+          "method": "GET",
+          "host": [
+            "https://api.restful-api.dev"
+          ],
+          "disable_host_sanitize": false,
+          "extra_config": {
+            "plugin/http-client": {
+              "name": "qap-krakend-plugin",
+              "gateway_name": "api-terra",
+              "endpoint": "/api-terra/solo2"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api-terra/usersClima",
+      "method": "DELETE",
+      "output_encoding": "no-op",
+      "input_headers": [
+        "Authorization",
+        "X-User",
+        "X-Roles"
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "https://idp.konneqt.cloud/realms/qap-dev/protocol/openid-connect/certs",
+          "propagate_claims": [
+            [
+              "sub",
+              "X-User"
+            ],
+            [
+              "realm_access.roles",
+              "X-Roles"
+            ]
+          ],
+          "propagate_headers": [
+            "Authorization"
+          ]
+        },
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET"
+          ],
+          "expose_headers": [
+            "*"
+          ],
+          "allow_headers": [
+            "*"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        },
+        "proxy": {
+          "sequential": true
+        },
+        "error": {
+          "return_status_code": 400,
+          "return_body": true
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/users",
+          "encoding": "json",
+          "sd": "static",
+          "method": "GET",
+          "host": [
+            "https://63ee25ec5e9f1583bdbd0d37.mockapi.io/"
+          ],
+          "disable_host_sanitize": false,
+          "extra_config": {
+            "plugin/http-client": {
+              "name": "qap-krakend-plugin",
+              "gateway_name": "api-terra",
+              "endpoint": "/api-terra/usersClima"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
