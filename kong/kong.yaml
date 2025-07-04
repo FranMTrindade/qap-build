@@ -1,0 +1,16 @@
+_format_version: '3.0'
+services:
+  - name: api-agua-umidade-service
+    url: https://api.restful-api.dev
+    routes:
+      - name: api-agua-umidade-route
+        paths:
+          - /api-agua/umidade
+        strip_path: true
+        methods:
+          - GET
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: /objects
