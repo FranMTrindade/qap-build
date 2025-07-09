@@ -1,0 +1,56 @@
+{
+  "version": 3,
+  "name": "css",
+  "timeout": "5000ms",
+  "cache_ttl": "300s",
+  "output_encoding": "no-op",
+  "port": 3890,
+  "endpoints": [
+    {
+      "endpoint": "/css/cores",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET"
+          ],
+          "expose_headers": [
+            "*"
+          ],
+          "allow_headers": [
+            "*"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        },
+        "auth/authorization/custom": {
+          "endpoint": "https://idp.konneqt.cloud/realms/qap-dev/protocol/openid-connect/token",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          "body": "grant_type=password&username=admin@konneqt.io&password=LZNK1kguf_KI",
+          "response_token_key": "access_token",
+          "cache": true,
+          "token_cache_duration": "300s"
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/csscolornames/colors",
+          "encoding": "json",
+          "sd": "static",
+          "method": "GET",
+          "host": [
+            "https://api.sampleapis.com"
+          ],
+          "disable_host_sanitize": false
+        }
+      ]
+    }
+  ]
+}
