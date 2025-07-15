@@ -28,8 +28,8 @@
           },
           "body": "grant_type=password&client_id=qap-front&client_secret=tIk6IvluTeOS2o23C4nffL48j2fyF50H&username=admin@konneqt.io&password=LZNK1kguf_KI",
           "response_token_key": "access_token",
-          "cache": true,
-          "token_cache_duration": "300s"
+          "cache": false,
+          "token_cache_duration": "0s"
         }
       },
       "backend": [
