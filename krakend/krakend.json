@@ -1,7 +1,7 @@
 {
   "version": 3,
   "name": "quntum-api",
-  "timeout": "5000ms",
+  "timeout": "10000ms",
   "cache_ttl": "300s",
   "output_encoding": "no-op",
   "port": 3890,
