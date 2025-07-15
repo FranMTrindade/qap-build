@@ -37,7 +37,9 @@
           "encoding": "json",
           "sd": "static",
           "method": "GET",
-          "host": ["https://quantum-admin-api-dev.konneqt.cloud/"],
+          "host": [
+            "https://quantum-admin-api-dev.konneqt.cloud/"
+          ],
           "disable_host_sanitize": false
         }
       ]
