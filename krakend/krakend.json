@@ -9,7 +9,8 @@
     {
       "endpoint": "/quntum-api/api",
       "method": "GET",
-      "output_encoding": "no-op",
+      "input_headers": ["Authorization"],
+      "output_headers": ["Authorization"],
       "extra_config": {
         "security/cors": {
           "allow_origins": ["*"],
@@ -40,7 +41,10 @@
           "host": [
             "https://quantum-admin-api-dev.konneqt.cloud/"
           ],
-          "disable_host_sanitize": false
+          "disable_host_sanitize": false,
+          "extra_config": {
+            "forwarding_headers": ["Authorization"]
+          }
         }
       ]
     }
