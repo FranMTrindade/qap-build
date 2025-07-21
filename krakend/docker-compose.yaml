@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  krakend:
+    image: devopsfaith/krakend:2.7.0
+    container_name: krakend
+    ports:
+      - "3890:3890"
+      - "9191:9191"
+    volumes:
+      - ./config:/etc/krakend/config
+      - ./plugins:/etc/krakend/plugins
+    command: ["run", "-d", "-c", "/etc/krakend/config/krakend.json"]
+    environment:
+      - KRAKEND_NAME=qap-auth-gateway
+    networks:
+      - qap-network
+
+networks:
+  qap-network:
