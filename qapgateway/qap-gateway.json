@@ -19,7 +19,7 @@
       "extra_config": {
         "auth/validator": {
           "alg": "RS256",
-          "jwk_url": "https://idp.konneqt.cloud/realms/qap-local/protocol/openid-connect/certs",
+          "jwk_url": "https://idp.konneqt.cloud/realms/qap-dev/protocol/openid-connect/certs",
           "propagate_claims": [
             ["sub", "X-User"],
             ["realm_access.roles", "X-Roles"]
