@@ -12,30 +12,46 @@
     {
       "endpoint": "/quantum/api",
       "method": "GET",
-      "output_encoding": "no-op",
       "input_headers": [
-        "X-User-Token",
-        "X-User",
-        "X-Roles"
+        "Authorization"
       ],
+      "output_encoding": "no-op",
       "extra_config": {
         "auth/validator": {
           "alg": "RS256",
-          "jwk_url": "https://idp.konneqt.cloud/realms/qap-dev/protocol/openid-connect/certs",
-          "jwt_header_name": "X-User-Token",
+          "jwk_url": "https://idp.konneqt.cloud/realms/qap-local/protocol/openid-connect/certs",
           "propagate_claims": [
             ["sub", "X-User"],
             ["realm_access.roles", "X-Roles"]
           ],
-          "propagate_headers": ["Authorization"]
+          "propagate_headers": [
+            "Authorization"
+          ]
+        },
+        "security/cors": {
+          "allow_origins": ["*"],
+          "allow_methods": ["GET"],
+          "expose_headers": ["*"],
+          "allow_headers": ["*"],
+          "max_age": "12h",
+          "allow_credentials": false
+        },
+        "proxy": {
+          "sequential": true
+        },
+        "error": {
+          "return_status_code": 400,
+          "return_body": true
         }
       },
       "backend": [
         {
           "url_pattern": "/api",
+          "encoding": "json",
+          "sd": "static",
           "method": "GET",
           "host": [
-            "https://seu-backend-api"
+            "https://dog.ceo"
           ],
           "extra_config": {
             "plugin/http-client": {
