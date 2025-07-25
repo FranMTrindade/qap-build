@@ -51,7 +51,7 @@
           "sd": "static",
           "method": "GET",
           "host": [
-            "https://dog.ceo"
+            "https://quantum-admin-api-dev.konneqt.cloud"
           ],
           "extra_config": {
             "plugin/http-client": {
