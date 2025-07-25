@@ -1,4 +1,4 @@
-
+// main.go
 package main
 
 import (
@@ -136,16 +136,24 @@ func (r registerer) registerClients(_ context.Context, extra map[string]interfac
 			http.Error(w, "Failed to create forward request", http.StatusInternalServerError)
 			return
 		}
-
 		forwardReq.Header = req.Header.Clone()
 
+		// Token do usuário (Token A)
+		userToken := req.Header.Get("X-User-Token")
+		if userToken != "" {
+			forwardReq.Header.Set("X-Authorization-User", userToken)
+			logger.Debug("🔐 Preserving user token in X-Authorization-User")
+		}
+
+		// Token do sistema (Token B)
 		systemToken, err := getSystemAccessToken()
 		if err != nil {
-			logger.Error("Failed to get internal system token:", err)
+			logger.Error("🔐 Failed to get internal system token:", err)
 			http.Error(w, "Internal authentication failed", http.StatusUnauthorized)
 			return
 		}
 		forwardReq.Header.Set("Authorization", "Bearer "+systemToken)
+		logger.Debug("🔐 Injected system token into Authorization header")
 
 		resp, err := http.DefaultClient.Do(forwardReq)
 		if err != nil {
@@ -161,7 +169,6 @@ func (r registerer) registerClients(_ context.Context, extra map[string]interfac
 		}
 
 		userEmail := req.Header.Get("X-User-Email")
-		authToken := req.Header.Get("Authorization")
 
 		mergedHeaders := map[string][]string{}
 		for k, v := range resp.Header {
@@ -173,8 +180,8 @@ func (r registerer) registerClients(_ context.Context, extra map[string]interfac
 		if userEmail != "" {
 			mergedHeaders["X-User-Email"] = []string{userEmail}
 		}
-		if authToken != "" {
-			mergedHeaders["X-Authorization"] = []string{authToken}
+		if userToken != "" {
+			mergedHeaders["X-Authorization-User"] = []string{userToken}
 		}
 
 		responseObject := ResponseObject{
@@ -205,8 +212,8 @@ func (r registerer) registerClients(_ context.Context, extra map[string]interfac
 		if userEmail != "" {
 			w.Header().Set("X-User-Email", userEmail)
 		}
-		if authToken != "" {
-			w.Header().Set("X-Authorization", authToken)
+		if userToken != "" {
+			w.Header().Set("X-Authorization-User", userToken)
 		}
 
 		w.WriteHeader(resp.StatusCode)
@@ -227,7 +234,7 @@ func getSystemAccessToken() (string, error) {
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Cookie", "GAESA=CoYBMDA3ZjY1YzZkMjZhY2JkMTY3YzhmZWUxNjBhNzVjMjg5MDQxNjA1NTVjYTgxZTJiN2Y4NWZhOTM2M2IxYTZlZDE0YWMyOGZkZGRkMzg5ZWUwYTFmYWNhZDZmMzFlOWFiZDBhMzg5NzQ2MmFmMmM3YjZkMWQzMDdlY2ExZjVkMWNiY2FlYWMQoOO_0e4y")
+	req.Header.Set("Cookie", "GAESA=...") // ⚠️ mantenha o seu cookie real aqui
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
