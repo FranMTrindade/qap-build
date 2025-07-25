@@ -1,13 +1,12 @@
 {
   "version": 3,
   "name": "quantum",
-  "output_encoding": "no-op",
-  "timeout": "5000ms",
-  "cache_ttl": "300s",
   "port": 8080,
+  "timeout": "5000ms",
+  "output_encoding": "no-op",
   "plugin": {
-    "pattern": ".so",
-    "folder": "/etc/krakend/plugins/"
+    "folder": "/etc/krakend/plugins/",
+    "pattern": ".so"
   },
   "endpoints": [
     {
@@ -15,62 +14,29 @@
       "method": "GET",
       "output_encoding": "no-op",
       "input_headers": [
-        "Authorization",
+        "X-User-Token",
         "X-User",
         "X-Roles"
       ],
       "extra_config": {
         "auth/validator": {
           "alg": "RS256",
-          "jwk_url": "https://idp.konneqt.cloud/realms/qap-local/protocol/openid-connect/certs",
+          "jwk_url": "https://idp.konneqt.cloud/realms/qap-dev/protocol/openid-connect/certs",
+          "jwt_header_name": "X-User-Token",
           "propagate_claims": [
-            [
-              "sub",
-              "X-User"
-            ],
-            [
-              "realm_access.roles",
-              "X-Roles"
-            ]
+            ["sub", "X-User"],
+            ["realm_access.roles", "X-Roles"]
           ],
-          "propagate_headers": [
-            "Authorization"
-          ]
-        },
-        "security/cors": {
-          "allow_origins": [
-            "*"
-          ],
-          "allow_methods": [
-            "GET"
-          ],
-          "expose_headers": [
-            "*"
-          ],
-          "allow_headers": [
-            "*"
-          ],
-          "max_age": "12h",
-          "allow_credentials": false
-        },
-        "proxy": {
-          "sequential": true
-        },
-        "error": {
-          "return_status_code": 400,
-          "return_body": true
+          "propagate_headers": ["Authorization"]
         }
       },
       "backend": [
         {
           "url_pattern": "/api",
-          "encoding": "json",
-          "sd": "static",
           "method": "GET",
           "host": [
-            "https://quantum-admin-api-dev.konneqt.cloud"
+            "https://seu-backend-api"
           ],
-          "disable_host_sanitize": false,
           "extra_config": {
             "plugin/http-client": {
               "name": "qap-krakend-plugin",
