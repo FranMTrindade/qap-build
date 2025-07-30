@@ -1,0 +1,78 @@
+
+  stages:
+    - krakend_deploy
+    - kong_deploy
+    - qap_gateway_deploy
+  
+  variables:
+    IMAGE_TAG: "latest"
+  
+  krakend-deploy:
+    stage: krakend_deploy
+    image: mcr.microsoft.com/azure-cli
+    services:
+      - docker:dind
+    script:
+      - echo "🔐 Docker login"
+      - docker login -u "$REGISTRY_USER" -p "$REGISTRY_TOKEN"
+      
+      - echo "🐳 Build e push da imagem"
+      - docker build -t $REGISTRY_USER/gh_with_azure_krakend:$IMAGE_TAG -f ./krakend/dockerfile .
+      - docker push $REGISTRY_USER/gh_with_azure_krakend:$IMAGE_TAG
+  
+      - echo "🔑 Login Azure"
+      - az login --service-principal -u "$AZURE_CLIENT_ID" -p "$AZURE_CLIENT_SECRET" --tenant "$AZURE_TENANT_ID"
+  
+      - echo "🚀 Deploy no Azure Container App"
+      - az containerapp update           --name $AZURE_KRAKEND_CONTAINERAPP_NAME           --resource-group $AZURE_RESOURCE_GROUP           --image "$REGISTRY_USER/gh_with_azure_krakend:$IMAGE_TAG"
+  
+      - echo "📣 Webhook"
+      - >
+        curl --location https://123c-200-169-13-178.ngrok-free.app/webhook           --header "Content-Type: application/json"           --data '{
+            "url": "https://gh_with_azure.on.qriarlabs.com",
+            "api": "cachorro",
+            "deploymentUnit": "gh_with_azure",
+            "ciStatus": "DEPLOYED"
+          }'
+  
+  kong-deploy:
+    stage: kong_deploy
+    image: mcr.microsoft.com/azure-cli
+    services:
+      - docker:dind
+    script:
+      - docker login -u "$REGISTRY_USER" -p "$REGISTRY_TOKEN"
+      - docker build -t $REGISTRY_USER/gh_with_azure_kong:$IMAGE_TAG -f ./kong/dockerfile .
+      - docker push $REGISTRY_USER/gh_with_azure_kong:$IMAGE_TAG
+      - az login --service-principal -u "$AZURE_CLIENT_ID" -p "$AZURE_CLIENT_SECRET" --tenant "$AZURE_TENANT_ID"
+      - az containerapp update           --name $AZURE_KONG_CONTAINERAPP_NAME           --resource-group $AZURE_RESOURCE_GROUP           --image "$REGISTRY_USER/gh_with_azure_kong:$IMAGE_TAG"
+      - >
+        curl --location https://123c-200-169-13-178.ngrok-free.app/webhook           --header "Content-Type: application/json"           --data '{
+            "url": "https://gh_with_azure.on.qriarlabs.com",
+            "api": "cachorro",
+            "deploymentUnit": "gh_with_azure",
+            "ciStatus": "DEPLOYED"
+          }'
+  
+  qap-gateway-deploy:
+    stage: qap_gateway_deploy
+    image: mcr.microsoft.com/azure-cli
+    services:
+      - docker:dind
+    script:
+      - apk add --no-cache go curl
+      - mkdir -p qapgateway/plugins
+      - docker run --rm -v "$PWD/qapgateway:/app" -w /app krakend/builder:2.7.0           go build -buildmode=plugin -o plugins/qap-krakend-plugin.so .
+      - docker login -u "$REGISTRY_USER" -p "$REGISTRY_TOKEN"
+      - docker build           --build-arg NATS_URL=$NATS_URL           --build-arg NATS_TOKEN=$NATS_TOKEN           --build-arg NATS_QUEUE_QAP=$NATS_QUEUE_QAP           --build-arg NATS_QUEUE_ANALYTICS=$NATS_QUEUE_ANALYTICS           --build-arg ENDPOINT_CHECK=$ENDPOINT_CHECK           -t $REGISTRY_USER/gh_with_azure_qap_gateway:$IMAGE_TAG           -f ./qapgateway/dockerfile ./qapgateway
+      - docker push $REGISTRY_USER/gh_with_azure_qap_gateway:$IMAGE_TAG
+      - az login --service-principal -u "$AZURE_CLIENT_ID" -p "$AZURE_CLIENT_SECRET" --tenant "$AZURE_TENANT_ID"
+      - az containerapp update           --name $AZURE_QAP_CONTAINERAPP_NAME           --resource-group $AZURE_RESOURCE_GROUP           --image "$REGISTRY_USER/gh_with_azure_qap_gateway:$IMAGE_TAG"
+      - >
+        curl --location https://123c-200-169-13-178.ngrok-free.app/webhook           --header "Content-Type: application/json"           --data '{
+            "url": "https://gh_with_azure.on.qriarlabs.com",
+            "api": "cachorro",
+            "deploymentUnit": "gh_with_azure",
+            "ciStatus": "DEPLOYED"
+          }'
+    
