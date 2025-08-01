@@ -1,0 +1,206 @@
+name: Deploy gwazttt to Azure
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_TAG: ${{ github.run_id }}_${{ github.run_number }}_${{ github.sha }}
+  REGISTRY: docker.io
+  WEBHOOK_URL: https://123c-200-169-13-178.ngrok-free.app/webhook
+  DEPLOYMENT_UNIT: gwazttt
+  API_KEY: cachorro
+
+jobs:
+  set-flags:
+    runs-on: ubuntu-latest
+    outputs:
+      krakend_enabled: ${{ steps.set-flags.outputs.krakend_enabled }}
+      kong_enabled: ${{ steps.set-flags.outputs.kong_enabled }}
+      qap_gateway_enabled: ${{ steps.set-flags.outputs.qap_gateway_enabled }}
+    steps:
+      - name: Notify QAP Admin - Init CI
+        run: |
+          curl --location 'https://123c-200-169-13-178.ngrok-free.app/webhook' \
+            --header 'Content-Type: application/json' \
+            --data '{
+              "url": "https://gwazttt.on.qriarlabs.com",
+              "api": "cachorro",
+              "deploymentUnit": "gwazttt",
+              "ciStatus": "Init CI"
+            }'
+
+      - name: Set flags for KrakenD, Kong, and QAP Gateway
+        id: set-flags
+        run: |
+          if [ -n "${{ secrets.AZURE_KRAKEND_CONTAINERAPP_NAME }}" ]; then
+            echo "krakend_enabled=true" >> $GITHUB_OUTPUT
+          fi
+          if [ -n "${{ secrets.AZURE_KONG_CONTAINERAPP_NAME }}" ]; then
+            echo "kong_enabled=true" >> $GITHUB_OUTPUT
+          fi
+          if [ -n "${{ secrets.AZURE_QAPGATEWAY_CONTAINERAPP_NAME}}" ]; then
+            echo "qap_gateway_enabled=true" >> $GITHUB_OUTPUT
+          fi
+
+  krakend-deploy:
+    name: Deploy KrakenD
+    runs-on: ubuntu-latest
+    needs: set-flags
+    if: needs.set-flags.outputs.krakend_enabled == 'true'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+
+      - name: Login to DockerHub
+        run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login -u "${{ secrets.REGISTRY_USER }}" --password-stdin
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t ${{ secrets.REGISTRY_USER }}/gwazttt_krakend:${{ env.IMAGE_TAG }} -f ./krakend/dockerfile .
+          docker push ${{ secrets.REGISTRY_USER }}/gwazttt_krakend:${{ env.IMAGE_TAG }}
+
+      - name: Login Azure and Deploy
+        run: |
+          echo "🔐 Login Azure"
+          az login --service-principal \
+            -u "${{ secrets.AZURE_CLIENT_ID }}" \
+            -p "${{ secrets.AZURE_CLIENT_SECRET }}" \
+            --tenant "${{ secrets.AZURE_TENANT_ID }}"
+
+          echo "🔒 Setando autenticação no registry"
+          az containerapp registry set \
+            --name "${{ secrets.AZURE_KRAKEND_CONTAINERAPP_NAME }}" \
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
+            --server docker.io \
+            --username "${{ secrets.REGISTRY_USER }}" \
+            --password "${{ secrets.REGISTRY_TOKEN }}"
+
+          echo "🚀 Deploy no Azure Container App"
+          az containerapp update \
+            --name "${{ secrets.AZURE_KRAKEND_CONTAINERAPP_NAME }}" \
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
+            --image "${{ secrets.REGISTRY_USER }}/gwazttt_krakend:${{ env.IMAGE_TAG }}"
+
+      - name: Notify Webhook
+        run: |
+          echo "📣 Webhook"
+          curl --location https://123c-200-169-13-178.ngrok-free.app/webhook \
+            --header "Content-Type: application/json" \
+            --data '{
+              "url": "https://gwazttt.on.qriarlabs.com",
+              "api": "cachorro",
+              "deploymentUnit": "gwazttt",
+              "ciStatus": "DEPLOYED"
+            }'
+
+  kong-deploy:
+    name: Deploy Kong
+    runs-on: ubuntu-latest
+    needs: set-flags
+    if: needs.set-flags.outputs.kong_enabled == 'true'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Docker login and build
+        run: |
+          echo "${{ secrets.REGISTRY_TOKEN }}" | docker login -u "${{ secrets.REGISTRY_USER }}" --password-stdin
+          docker build -t ${{ secrets.REGISTRY_USER }}/gwazttt_kong:${{ env.IMAGE_TAG }} -f ./kong/dockerfile .
+          docker push ${{ secrets.REGISTRY_USER }}/gwazttt_kong:${{ env.IMAGE_TAG }}
+
+      - name: Login Azure and Deploy
+        run: |
+          echo "🔐 Login Azure"
+          az login --service-principal \
+            -u "${{ secrets.AZURE_CLIENT_ID }}" \
+            -p "${{ secrets.AZURE_CLIENT_SECRET }}" \
+            --tenant "${{ secrets.AZURE_TENANT_ID }}"
+
+          echo "🔒 Setando autenticação no registry"
+          az containerapp registry set \
+            --name "${{ secrets.AZURE_KONG_CONTAINERAPP_NAME }}" \
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
+            --server docker.io \
+            --username "${{ secrets.REGISTRY_USER }}" \
+            --password "${{ secrets.REGISTRY_TOKEN }}"
+
+          echo "🚀 Deploy no Azure Container App"
+          az containerapp update \
+            --name "${{ secrets.AZURE_KONG_CONTAINERAPP_NAME }}" \
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
+            --image "${{ secrets.REGISTRY_USER }}/gwazttt_kong:${{ env.IMAGE_TAG }}"
+
+      - name: Notify Webhook
+        run: |
+          echo "📣 Webhook"
+          curl --location https://123c-200-169-13-178.ngrok-free.app/webhook \
+            --header "Content-Type: application/json" \
+            --data '{
+              "url": "https://gwazttt.on.qriarlabs.com",
+              "api": "cachorro",
+              "deploymentUnit": "gwazttt",
+              "ciStatus": "DEPLOYED"
+            }'
+
+  qap-gateway-deploy:
+    name: Deploy QAP Gateway
+    runs-on: ubuntu-latest
+    needs: set-flags
+    if: needs.set-flags.outputs.qap_gateway_enabled == 'true'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Go and compile plugin
+        run: |
+          sudo apt update
+          sudo apt install -y golang-go
+          mkdir -p qapgateway/plugins
+          docker run --rm -v "${PWD}/qapgateway:/app" -w /app krakend/builder:2.7.0 \
+            go build -buildmode=plugin -o plugins/qap-krakend-plugin.so .
+
+      - name: Docker login and build
+        run: |
+          echo "${{ secrets.REGISTRY_TOKEN }}" | docker login -u "${{ secrets.REGISTRY_USER }}" --password-stdin
+          docker build \
+            --build-arg NATS_URL=${{ secrets.NATS_URL }} \
+            --build-arg NATS_TOKEN=${{ secrets.NATS_TOKEN }} \
+            --build-arg NATS_QUEUE_QAP=${{ secrets.NATS_QUEUE_QAP }} \
+            --build-arg NATS_QUEUE_ANALYTICS=${{ secrets.NATS_QUEUE_ANALYTICS }} \
+            --build-arg ENDPOINT_CHECK=${{ secrets.ENDPOINT_CHECK }} \
+            -t ${{ secrets.REGISTRY_USER }}/gwazttt_qap_gateway:${{ env.IMAGE_TAG }} \
+            -f ./qapgateway/dockerfile ./qapgateway
+          docker push ${{ secrets.REGISTRY_USER }}/gwazttt_qap_gateway:${{ env.IMAGE_TAG }}
+
+      - name: Login Azure and Deploy
+        run: |
+          echo "🔐 Login Azure"
+          az login --service-principal \
+            -u "${{ secrets.AZURE_CLIENT_ID }}" \
+            -p "${{ secrets.AZURE_CLIENT_SECRET }}" \
+            --tenant "${{ secrets.AZURE_TENANT_ID }}"
+
+          echo "🔒 Setando autenticação no registry"
+          az containerapp registry set \
+            --name "${{ secrets.AZURE_QAPGATEWAY_CONTAINERAPP_NAME }}" \
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
+            --server docker.io \
+            --username "${{ secrets.REGISTRY_USER }}" \
+            --password "${{ secrets.REGISTRY_TOKEN }}"
+
+          echo "🚀 Deploy no Azure Container App"
+          az containerapp update \
+            --name "${{ secrets.AZURE_QAPGATEWAY_CONTAINERAPP_NAME }}" \
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
+            --image "${{ secrets.REGISTRY_USER }}/gwazttt_qap_gateway:${{ env.IMAGE_TAG }}"
+
+      - name: Notify Webhook
+        run: |
+          echo "📣 Webhook"
+          curl --location https://123c-200-169-13-178.ngrok-free.app/webhook \
+            --header "Content-Type: application/json" \
+            --data '{
+              "url": "https://gwazttt.on.qriarlabs.com",
+              "api": "cachorro",
+              "deploymentUnit": "gwazttt",
+              "ciStatus": "DEPLOYED"
+            }'
