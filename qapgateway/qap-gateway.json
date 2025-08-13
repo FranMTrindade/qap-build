@@ -1,0 +1,91 @@
+{
+  "version": 3,
+  "name": "paid--product",
+  "output_encoding": "no-op",
+  "timeout": "10000ms",
+  "cache_ttl": "300s",
+  "port": 8080,
+  "plugin": {
+    "pattern": ".so",
+    "folder": "/etc/krakend/plugins/"
+  },
+  "endpoints": [
+    {
+      "endpoint": "/paid-product/cachorro/dog",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": [
+        "Authorization"
+      ],
+      "input_query_strings": [],
+      "extra_config": {
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET"
+          ],
+          "expose_headers": [
+            "*"
+          ],
+          "allow_headers": [
+            "*"
+          ],
+          "max_age": "12h",
+          "allow_credentials": false
+        },
+        "proxy": {
+          "sequential": true
+        },
+        "error": {
+          "return_status_code": 400,
+          "return_body": true
+        },
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "https://idp.konneqt.cloud/realms/qap-local/protocol/openid-connect/certs",
+          "propagate_claims": [
+            [
+              "sub",
+              "X-User"
+            ],
+            [
+              "realm_access.roles",
+              "X-Roles"
+            ]
+          ],
+          "propagate_headers": [
+            "Authorization"
+          ]
+        },
+        "qos/ratelimit/router": {
+          "max_rate": 10,
+          "client_max_rate": 10,
+          "every": "10m",
+          "strategy": "ip",
+          "burst": 10
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "api/breeds/image/random",
+          "encoding": "json",
+          "sd": "static",
+          "method": "GET",
+          "host": [
+            "https://dog.ceo/"
+          ],
+          "disable_host_sanitize": false,
+          "extra_config": {
+            "plugin/http-client": {
+              "name": "qap-krakend-plugin",
+              "gateway_name": "paid--product",
+              "endpoint": "/paid-product/cachorro/dog"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
